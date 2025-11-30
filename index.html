@@ -12,7 +12,19 @@
   .product { border: 1px solid #ccc; padding: 1em; width: 200px; margin: 0.5em; text-align: center; }
   .product img { width: 100%; height: auto; }
   input, select, button, textarea { padding: 0.5em; margin: 0.3em 0; width: 100%; font-family: Arial, sans-serif; }
-  #cart { position: fixed; top: 1em; right: 1em; background: #f8f8f8; padding: 1em; border: 1px solid #ccc; width: 260px; }
+  #cart {
+    position: fixed;
+    top: 1em;
+    right: -300px; /* Initially hidden off-screen */
+    background: #f8f8f8;
+    padding: 1em;
+    border: 1px solid #ccc;
+    width: 260px;
+    transition: right 0.3s ease; /* Smooth sliding animation */
+  }
+  #cart.open {
+    right: 1em; /* Display the cart when the 'open' class is added */
+  }
   #checkout { margin-top: 1em; }
 </style>
 </head>
@@ -20,6 +32,7 @@
 
 <header>
   <h1>Cheema Shop</h1>
+  <img src="cart-icon.png" alt="Cart Icon" id="cart-icon" style="cursor: pointer; width: 30px; height: 30px;" />
 </header>
 
 <div class="container">
@@ -46,12 +59,20 @@
     <button onclick="addToCart(2)">Add to Cart</button>
   </div>
 
-  <!-- NEW PRODUCT: Islamic Jar -->
+  <!-- Islamic Jar -->
   <div class="product">
-    <img src="download (3).png" alt="Islamic Jar" />
+    <img src="islamic-jar.png" alt="Islamic Jar" />
     <h3>Islamic Jar</h3>
     <p>Price: PKR <span>990</span></p>
     <button onclick="addToCart(3)">Add to Cart</button>
+  </div>
+
+  <!-- NEW PRODUCT: 1 Night with Hamzah -->
+  <div class="product">
+    <img src="IMG_5697.png" alt="1 Night with Hamzah" />
+    <h3>1 Night with Hamzah</h3>
+    <p>Price: PKR <span>9999</span></p>
+    <button onclick="addToCart(4)">Add to Cart</button>
   </div>
 
 </div>
@@ -83,7 +104,8 @@ let cart = [];
 const products = {
   1: { id: 1, name: "Knee Pads", price: 2000 },
   2: { id: 2, name: "Ergonomic Salah Prayer Mat", price: 5900 },
-  3: { id: 3, name: "Islamic Jar", price: 990 }
+  3: { id: 3, name: "Islamic Jar", price: 990 },
+  4: { id: 4, name: "1 Night with Hamzah", price: 9999 }
 };
 
 function addToCart(productId) {
@@ -161,6 +183,12 @@ function checkout() {
   cart = [];
   renderCart();
 }
+
+// Toggle cart visibility when cart icon is clicked
+document.getElementById("cart-icon").addEventListener("click", function() {
+  const cartElement = document.getElementById("cart");
+  cartElement.classList.toggle("open"); // Add or remove the 'open' class
+});
 </script>
 
 </body>
