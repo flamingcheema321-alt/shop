@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cheema Shop</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+  header { background: #4CAF50; color: white; padding: 1em; text-align: center; }
+  .container { display: flex; flex-wrap: wrap; padding: 1em; }
+  .product { border: 1px solid #ccc; padding: 1em; width: 200px; margin: 0.5em; text-align: center; }
+  .product img { width: 100%; height: auto; }
+  input, select, button, textarea { padding: 0.5em; margin: 0.3em 0; width: 100%; }
+  #cart { position: fixed; top: 1em; right: 1em; background: #f8f8f8; padding: 1em; border: 1px solid #ccc; width: 240px; }
+  #checkout { margin-top: 1em; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Cheema Shop</h1>
+</header>
+
+<div class="container">
+  <div class="product">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIwAAACCCAYAAAC+XQAiAAAACXBIWXMAAAsTAAALEwEAmpwYAAABV0lEQVR4nO3XvUoDQRDG8XfX+AcTWpIKz9Q+xAlyiWLFhFNRKyYHvFqyl/Nh6sZnfN+/Z0AwAAAAAAwG/mTgsTJnHjqvXkc04cgM+fm7ReFnBYfRw8LjQoL5e/fb6dfH3aJxA+5q6oOaLqDkuWqk+HYcVwQOepbDhzXjWLoOaG1FvP6MbT63dRfUQzmY42Jr3Ou2sF/VJK9HpeWtVbnPbRav7tqXurUtmnrHeKvQK/Rw8LjQoL5e/ffbq/c6EXF5aN5OXjqvyv6lB0N4GLqfPkz+/z3OKnxNQJuaz3PHjzMAAAAAAAAYDY73QcAAAAAAIB4N/QFAAD//9nqBwAAAABJRU5ErkJggg==" alt="Knee Pads" />
+    <h3>Knee Pads</h3>
+    <p>Price: PKR <span id="product-price">2000</span></p>
+    <select id="size-selector">
+      <option value="S">Small</option>
+      <option value="M">Medium</option>
+      <option value="L">Large</option>
+      <option value="XL">Extra Large</option>
+    </select>
+    <button onclick="addToCart()">Add to Cart</button>
+  </div>
+</div>
+
+<div id="cart">
+  <h3>Cart</h3>
+  <ul id="cart-items"></ul>
+  <strong>Total: PKR <span id="cart-total">0</span></strong>
+
+  <div id="customer-info">
+    <h4>Customer Details</h4>
+    <input type="text" id="customer-name" placeholder="Your Name" />
+    <input type="text" id="customer-phone" placeholder="Phone Number" />
+    <textarea id="customer-address" placeholder="Delivery Address"></textarea>
+  </div>
+
+  <div id="checkout">
+    <button onclick="checkout()">Pay with Easypaisa</button>
+  </div>
+</div>
+
+<script>
+let cart = [];
+const easypaisaNumber = "03494949454";
+const product = { id: 1, name: "Knee Pads", price: 2000 };
+
+// Add product to cart with selected size
+function addToCart() {
+  const size = document.getElementById("size-selector").value;
+  const cartItem = cart.find(c => c.id === product.id && c.size === size);
+  
+  if (cartItem) {
+    cartItem.quantity++;
+  } else {
+    cart.push({ ...product, size: size, quantity: 1 });
+  }
+  renderCart();
+}
+
+// Render cart
+function renderCart() {
+  const cartItems = document.getElementById("cart-items");
+  const cartTotal = document.getElementById("cart-total");
+  cartItems.innerHTML = "";
+  let total = 0;
+  cart.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = `${item.name} (${item.size}) x ${item.quantity} - PKR ${(item.price * item.quantity).toFixed(2)}`;
+    cartItems.appendChild(li);
+    total += item.price * item.quantity;
+  });
+  cartTotal.textContent = total.toFixed(2);
+}
+
+// Checkout via AJAX to PHP backend
+function checkout() {
+  if (cart.length === 0) {
+    alert("Your cart is empty!");
+    return;
+  }
+
+  const customerName = document.getElementById("customer-name").value.trim();
+  const customerPhone = document.getElementById("customer-phone").value.trim();
+  const customerAddress = document.getElementById("customer-address").value.trim();
+
+  if (!customerName || !customerPhone || !customerAddress) {
+    alert("Please fill in your name, phone number, and address.");
+    return;
+  }
+
+  let total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
+
+  fetch('send_order.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: customerName,
+      phone: customerPhone,
+      address: customerAddress,
+      cart: cart,
+      total: total
+    })
+  })
+  .then(res => res.text())
+  .then(response => {
+    alert(response);
+    cart = []; // Clear cart after successful order
+    renderCart();
+  })
+  .catch(err => {
+    alert('Error sending order. Please try again.');
+    console.error(err);
+  });
+}
+</script>
+
+</body>
+</html>
+
+
+
