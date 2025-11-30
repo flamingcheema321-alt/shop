@@ -59,20 +59,12 @@
     <button onclick="addToCart(2)">Add to Cart</button>
   </div>
 
-  <!-- Islamic Jar -->
+  <!-- NEW PRODUCT: Islamic Jar -->
   <div class="product">
     <img src="islamic-jar.png" alt="Islamic Jar" />
     <h3>Islamic Jar</h3>
     <p>Price: PKR <span>990</span></p>
     <button onclick="addToCart(3)">Add to Cart</button>
-  </div>
-
-  <!-- NEW PRODUCT: 1 Night with Hamzah -->
-  <div class="product">
-    <img src="IMG_5697.png" alt="1 Night with Hamzah" />
-    <h3>1 Night with Hamzah</h3>
-    <p>Price: PKR <span>9999</span></p>
-    <button onclick="addToCart(4)">Add to Cart</button>
   </div>
 
 </div>
@@ -104,8 +96,7 @@ let cart = [];
 const products = {
   1: { id: 1, name: "Knee Pads", price: 2000 },
   2: { id: 2, name: "Ergonomic Salah Prayer Mat", price: 5900 },
-  3: { id: 3, name: "Islamic Jar", price: 990 },
-  4: { id: 4, name: "1 Night with Hamzah", price: 9999 }
+  3: { id: 3, name: "Islamic Jar", price: 990 }
 };
 
 function addToCart(productId) {
@@ -171,27 +162,4 @@ function checkout() {
 
   let emailBody = `Order Details:\n\nCustomer Name: ${name}\nPhone: ${phone}\nAddress: ${address}\nPayment Method: ${paymentText}\n\nItems:\n`;
   cart.forEach(item => {
-    emailBody += `${item.name} (${item.size}) x ${item.quantity} - PKR ${item.price * item.quantity}\n`;
-  });
-
-  emailBody += `\nTotal: PKR ${total}`;
-
-  const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=iqbalayesha0151@gmail.com&su=New%20Order&body=${encodeURIComponent(emailBody)}`;
-  window.open(mailtoLink, "_blank");
-
-  alert("Order successful! Gmail draft opened.");
-  cart = [];
-  renderCart();
-}
-
-// Toggle cart visibility when cart icon is clicked
-document.getElementById("cart-icon").addEventListener("click", function() {
-  const cartElement = document.getElementById("cart");
-  cartElement.classList.toggle("open"); // Add or remove the 'open' class
-});
-</script>
-
-</body>
-</html>
-
-
+    emailBody
