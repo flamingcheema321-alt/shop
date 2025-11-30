@@ -5,13 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Cheema Shop</title>
 <style>
-  body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+  * { font-family: Arial, sans-serif; box-sizing: border-box; }
+  body { margin: 0; padding: 0; }
   header { background: #4CAF50; color: white; padding: 1em; text-align: center; }
   .container { display: flex; flex-wrap: wrap; padding: 1em; }
   .product { border: 1px solid #ccc; padding: 1em; width: 200px; margin: 0.5em; text-align: center; }
   .product img { width: 100%; height: auto; }
-  input, select, button, textarea { padding: 0.5em; margin: 0.3em 0; width: 100%; }
-  #cart { position: fixed; top: 1em; right: 1em; background: #f8f8f8; padding: 1em; border: 1px solid #ccc; width: 240px; }
+  input, select, button, textarea { padding: 0.5em; margin: 0.3em 0; width: 100%; font-family: Arial, sans-serif; }
+  #cart { position: fixed; top: 1em; right: 1em; background: #f8f8f8; padding: 1em; border: 1px solid #ccc; width: 260px; }
   #checkout { margin-top: 1em; }
 </style>
 </head>
@@ -23,7 +24,8 @@
 
 <div class="container">
   <div class="product">
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIwAAACCCAYAAAC+XQAiAAAACXBIWXMAAAsTAAALEwEAmpwYAAABV0lEQVR4nO3XvUoDQRDG8XfX+AcTWpIKz9Q+xAlyiWLFhFNRKyYHvFqyl/Nh6sZnfN+/Z0AwAAAAAAwG/mTgsTJnHjqvXkc04cgM+fm7ReFnBYfRw8LjQoL5e/fb6dfH3aJxA+5q6oOaLqDkuWqk+HYcVwQOepbDhzXjWLoOaG1FvP6MbT63dRfUQzmY42Jr3Ou2sF/VJK9HpeWtVbnPbRav7tqXurUtmnrHeKvQK/Rw8LjQoL5e/ffbq/c6EXF5aN5OXjqvyv6lB0N4GLqfPkz+/z3OKnxNQJuaz3PHjzMAAAAAAAAYDY73QcAAAAAAIB4N/QFAAD//9nqBwAAAABJRU5ErkJggg==" alt="Knee Pads" />
+    <!-- Image now comes from separate file -->
+    <img src="download.png" alt="Knee Pads" />
     <h3>Knee Pads</h3>
     <p>Price: PKR <span id="product-price">2000</span></p>
     <select id="size-selector">
@@ -46,23 +48,24 @@
     <input type="text" id="customer-name" placeholder="Your Name" />
     <input type="text" id="customer-phone" placeholder="Phone Number" />
     <textarea id="customer-address" placeholder="Delivery Address"></textarea>
+    <select id="payment-method">
+      <option value="easypaisa">Easypaisa</option>
+      <option value="cod">Cash on Delivery</option>
+    </select>
   </div>
 
   <div id="checkout">
-    <button onclick="checkout()">Pay with Easypaisa</button>
+    <button onclick="checkout()">Checkout</button>
   </div>
 </div>
 
 <script>
 let cart = [];
-const easypaisaNumber = "03494949454";
 const product = { id: 1, name: "Knee Pads", price: 2000 };
 
-// Add product to cart with selected size
 function addToCart() {
   const size = document.getElementById("size-selector").value;
   const cartItem = cart.find(c => c.id === product.id && c.size === size);
-  
   if (cartItem) {
     cartItem.quantity++;
   } else {
@@ -71,7 +74,6 @@ function addToCart() {
   renderCart();
 }
 
-// Render cart
 function renderCart() {
   const cartItems = document.getElementById("cart-items");
   const cartTotal = document.getElementById("cart-total");
@@ -86,50 +88,48 @@ function renderCart() {
   cartTotal.textContent = total.toFixed(2);
 }
 
-// Checkout via AJAX to PHP backend
 function checkout() {
   if (cart.length === 0) {
     alert("Your cart is empty!");
     return;
   }
 
-  const customerName = document.getElementById("customer-name").value.trim();
-  const customerPhone = document.getElementById("customer-phone").value.trim();
-  const customerAddress = document.getElementById("customer-address").value.trim();
+  const name = document.getElementById("customer-name").value.trim();
+  const phone = document.getElementById("customer-phone").value.trim();
+  const address = document.getElementById("customer-address").value.trim();
+  const payment = document.getElementById("payment-method").value;
 
-  if (!customerName || !customerPhone || !customerAddress) {
-    alert("Please fill in your name, phone number, and address.");
+  if (!name || !phone || !address) {
+    alert("Please fill all customer details.");
     return;
   }
 
   let total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  let paymentText = "";
 
-  fetch('send_order.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name: customerName,
-      phone: customerPhone,
-      address: customerAddress,
-      cart: cart,
-      total: total
-    })
-  })
-  .then(res => res.text())
-  .then(response => {
-    alert(response);
-    cart = []; // Clear cart after successful order
-    renderCart();
-  })
-  .catch(err => {
-    alert('Error sending order. Please try again.');
-    console.error(err);
+  if (payment === "cod") {
+    total += 300; // delivery fee
+    paymentText = "Cash on Delivery (Delivery Fee: 300 PKR)";
+  } else {
+    paymentText = "Easypaisa (Payable Amount: " + total + " PKR)";
+  }
+
+  let emailBody = `Order Details:\n\nCustomer Name: ${name}\nPhone: ${phone}\nAddress: ${address}\nPayment Method: ${paymentText}\n\nItems:\n`;
+  cart.forEach(item => {
+    emailBody += `${item.name} (${item.size}) x ${item.quantity} - PKR ${item.price * item.quantity}\n`;
   });
+  emailBody += `\nTotal: PKR ${total}`;
+
+  const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=iqbalayesha0151@gmail.com&su=New%20Order&body=${encodeURIComponent(emailBody)}`;
+  window.open(mailtoLink, "_blank");
+
+  alert("Order successful! Gmail draft opened.");
+  cart = [];
+  renderCart();
 }
 </script>
 
 </body>
 </html>
-
 
 
