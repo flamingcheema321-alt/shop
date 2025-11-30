@@ -7,32 +7,32 @@
 <style>
   * { font-family: Arial, sans-serif; box-sizing: border-box; }
   body { margin: 0; padding: 0; }
-  header { background: #4CAF50; color: white; padding: 1em; text-align: center; }
-  .container { display: flex; flex-wrap: wrap; padding: 1em; }
+  header { background: #4CAF50; color: white; padding: 1em; text-align: center; position: relative; }
+  .container { display: flex; flex-wrap: wrap; padding: 1em; justify-content: center; }
   .product { border: 1px solid #ccc; padding: 1em; width: 200px; margin: 0.5em; text-align: center; }
   .product img { width: 100%; height: auto; }
   input, select, button, textarea { padding: 0.5em; margin: 0.3em 0; width: 100%; font-family: Arial, sans-serif; }
   #cart {
     position: fixed;
     top: 1em;
-    right: -300px; /* Initially hidden off-screen */
+    right: -300px;
     background: #f8f8f8;
     padding: 1em;
     border: 1px solid #ccc;
     width: 260px;
-    transition: right 0.3s ease; /* Smooth sliding animation */
+    transition: right 0.3s ease;
+    z-index: 1000;
   }
-  #cart.open {
-    right: 1em; /* Display the cart when the 'open' class is added */
-  }
+  #cart.open { right: 1em; }
   #checkout { margin-top: 1em; }
+  #cart-icon { cursor: pointer; width: 30px; height: 30px; position: absolute; top: 10px; right: 10px; }
 </style>
 </head>
 <body>
 
 <header>
   <h1>Cheema Shop</h1>
-  <img src="cart-icon.png" alt="Cart Icon" id="cart-icon" style="cursor: pointer; width: 30px; height: 30px;" />
+  <img src="download (4).png" alt="Cart Icon" id="cart-icon" />
 </header>
 
 <div class="container">
@@ -42,7 +42,7 @@
     <img src="download.png" alt="Knee Pads" />
     <h3>Knee Pads</h3>
     <p>Price: PKR <span>2000</span></p>
-    <select id="size-selector">
+    <select class="size-selector" data-product="1">
       <option value="S">Small</option>
       <option value="M">Medium</option>
       <option value="L">Large</option>
@@ -51,7 +51,7 @@
     <button onclick="addToCart(1)">Add to Cart</button>
   </div>
 
-  <!-- Salah Prayer Mat -->
+  <!-- Product 2 -->
   <div class="product">
     <img src="download (2).png" alt="Salah Prayer Mat" />
     <h3>Ergonomic Salah Prayer Mat</h3>
@@ -59,7 +59,7 @@
     <button onclick="addToCart(2)">Add to Cart</button>
   </div>
 
-  <!-- NEW PRODUCT: Islamic Jar -->
+  <!-- Product 3 -->
   <div class="product">
     <img src="download (3).png" alt="Islamic Jar" />
     <h3>Islamic Jar</h3>
@@ -99,12 +99,21 @@ const products = {
   3: { id: 3, name: "Islamic Jar", price: 990 }
 };
 
+// Toggle cart visibility
+const cartIcon = document.getElementById("cart-icon");
+const cartElement = document.getElementById("cart");
+cartIcon.addEventListener("click", () => {
+  cartElement.classList.toggle("open");
+});
+
+// Add product to cart
 function addToCart(productId) {
   const product = products[productId];
-
   let size = "Standard";
+
   if (productId === 1) {
-    size = document.getElementById("size-selector").value;
+    const sizeSelector = document.querySelector(`.size-selector[data-product="${productId}"]`);
+    size = sizeSelector.value;
   }
 
   const existing = cart.find(c => c.id === product.id && c.size === size);
@@ -116,8 +125,10 @@ function addToCart(productId) {
   }
 
   renderCart();
+  cartElement.classList.add("open"); // Auto-open cart when adding item
 }
 
+// Render cart items
 function renderCart() {
   const cartItems = document.getElementById("cart-items");
   const cartTotal = document.getElementById("cart-total");
@@ -134,6 +145,7 @@ function renderCart() {
   cartTotal.textContent = total;
 }
 
+// Checkout process
 function checkout() {
   if (cart.length === 0) {
     alert("Your cart is empty!");
@@ -160,6 +172,24 @@ function checkout() {
     paymentText = "Easypaisa (Payable Amount: " + total + " PKR)";
   }
 
-  let emailBody = `Order Details:\n\nCustomer Name: ${name}\nPhone: ${phone}\nAddress: ${address}\nPayment Method: ${paymentText}\n\nItems:\n`;
+  let orderDetails = `Order Details:\n\nCustomer Name: ${name}\nPhone: ${phone}\nAddress: ${address}\nPayment Method: ${paymentText}\n\nItems:\n`;
   cart.forEach(item => {
-    emailBody
+    orderDetails += `${item.name} (${item.size}) x ${item.quantity} - PKR ${item.price * item.quantity}\n`;
+  });
+  orderDetails += `\nTotal: PKR ${total}`;
+
+  alert(orderDetails);
+
+  // Reset cart
+  cart = [];
+  renderCart();
+  cartElement.classList.remove("open");
+  document.getElementById("customer-name").value = "";
+  document.getElementById("customer-phone").value = "";
+  document.getElementById("customer-address").value = "";
+  document.getElementById("payment-method").value = "easypaisa";
+}
+</script>
+
+</body>
+</html>
