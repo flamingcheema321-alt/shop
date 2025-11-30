@@ -178,7 +178,9 @@ function checkout() {
   });
   orderDetails += `\nTotal: PKR ${total}`;
 
-  alert(orderDetails);
+  // Open default email client (Gmail, etc.) with order details
+  const mailtoLink = `mailto:iqbalayesha0151@gmail.com?subject=${encodeURIComponent("New Order from Cheema Shop")}&body=${encodeURIComponent(orderDetails)}`;
+  window.location.href = mailtoLink;
 
   // Reset cart
   cart = [];
