@@ -23,19 +23,37 @@
 </header>
 
 <div class="container">
+
+  <!-- Product 1 -->
   <div class="product">
-    <!-- Image now comes from separate file -->
     <img src="download.png" alt="Knee Pads" />
     <h3>Knee Pads</h3>
-    <p>Price: PKR <span id="product-price">2000</span></p>
+    <p>Price: PKR <span>2000</span></p>
     <select id="size-selector">
       <option value="S">Small</option>
       <option value="M">Medium</option>
       <option value="L">Large</option>
       <option value="XL">Extra Large</option>
     </select>
-    <button onclick="addToCart()">Add to Cart</button>
+    <button onclick="addToCart(1)">Add to Cart</button>
   </div>
+
+  <!-- Salah Prayer Mat -->
+  <div class="product">
+    <img src="download (2).png" alt="Salah Prayer Mat" />
+    <h3>Ergonomic Salah Prayer Mat</h3>
+    <p>Price: PKR <span>5900</span></p>
+    <button onclick="addToCart(2)">Add to Cart</button>
+  </div>
+
+  <!-- NEW PRODUCT: Islamic Jar -->
+  <div class="product">
+    <img src="download (3).png" alt="Islamic Jar" />
+    <h3>Islamic Jar</h3>
+    <p>Price: PKR <span>990</span></p>
+    <button onclick="addToCart(3)">Add to Cart</button>
+  </div>
+
 </div>
 
 <div id="cart">
@@ -61,16 +79,29 @@
 
 <script>
 let cart = [];
-const product = { id: 1, name: "Knee Pads", price: 2000 };
 
-function addToCart() {
-  const size = document.getElementById("size-selector").value;
-  const cartItem = cart.find(c => c.id === product.id && c.size === size);
-  if (cartItem) {
-    cartItem.quantity++;
+const products = {
+  1: { id: 1, name: "Knee Pads", price: 2000 },
+  2: { id: 2, name: "Ergonomic Salah Prayer Mat", price: 5900 },
+  3: { id: 3, name: "Islamic Jar", price: 990 }
+};
+
+function addToCart(productId) {
+  const product = products[productId];
+
+  let size = "Standard";
+  if (productId === 1) {
+    size = document.getElementById("size-selector").value;
+  }
+
+  const existing = cart.find(c => c.id === product.id && c.size === size);
+
+  if (existing) {
+    existing.quantity++;
   } else {
     cart.push({ ...product, size: size, quantity: 1 });
   }
+
   renderCart();
 }
 
@@ -79,13 +110,15 @@ function renderCart() {
   const cartTotal = document.getElementById("cart-total");
   cartItems.innerHTML = "";
   let total = 0;
+
   cart.forEach(item => {
     const li = document.createElement("li");
-    li.textContent = `${item.name} (${item.size}) x ${item.quantity} - PKR ${(item.price * item.quantity).toFixed(2)}`;
+    li.textContent = `${item.name} (${item.size}) x ${item.quantity} - PKR ${item.price * item.quantity}`;
     cartItems.appendChild(li);
     total += item.price * item.quantity;
   });
-  cartTotal.textContent = total.toFixed(2);
+
+  cartTotal.textContent = total;
 }
 
 function checkout() {
@@ -108,7 +141,7 @@ function checkout() {
   let paymentText = "";
 
   if (payment === "cod") {
-    total += 300; // delivery fee
+    total += 300;
     paymentText = "Cash on Delivery (Delivery Fee: 300 PKR)";
   } else {
     paymentText = "Easypaisa (Payable Amount: " + total + " PKR)";
@@ -118,6 +151,7 @@ function checkout() {
   cart.forEach(item => {
     emailBody += `${item.name} (${item.size}) x ${item.quantity} - PKR ${item.price * item.quantity}\n`;
   });
+
   emailBody += `\nTotal: PKR ${total}`;
 
   const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=iqbalayesha0151@gmail.com&su=New%20Order&body=${encodeURIComponent(emailBody)}`;
