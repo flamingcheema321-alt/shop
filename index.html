@@ -6,74 +6,112 @@
 <title>Cheema Shop</title>
 <style>
   * { font-family: Arial, sans-serif; box-sizing: border-box; }
-  body { margin: 0; padding: 0; }
-  header { background: #4CAF50; color: white; padding: 1em; text-align: center; position: relative; }
-  .container { display: flex; flex-wrap: wrap; padding: 1em; justify-content: center; }
-  .product { border: 1px solid #ccc; padding: 1em; width: 200px; margin: 0.5em; text-align: center; }
-  .product img { width: 100%; height: auto; }
-  input, select, button, textarea { padding: 0.5em; margin: 0.3em 0; width: 100%; font-family: Arial, sans-serif; }
-  #cart {
-    position: fixed;
-    top: 1em;
-    right: -300px;
-    background: #f8f8f8;
-    padding: 1em;
-    border: 1px solid #ccc;
-    width: 260px;
-    transition: right 0.3s ease;
-    z-index: 1000;
+  body { margin: 0; padding: 0; background:#fff; color:#000; transition: background 0.3s, color 0.3s; }
+  header { background: #000; color: #fff; padding: 1em; text-align: center; position: relative; display:flex; justify-content:center; align-items:center; gap:10px; }
+  .container { display: flex; flex-wrap: wrap; padding: 1em; justify-content: center; gap:10px; }
+  .product {
+    border: 1px solid #000; padding: 1em; width: 200px; margin: 0.5em; text-align: center;
+    cursor: pointer; background: #fff; border-radius: 8px; transition: transform 0.2s, box-shadow 0.2s;
+    opacity: 0; transform: translateY(20px);
   }
+  .product.show { opacity: 1; transform: translateY(0); }
+  .product:hover { transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+  .product img { width: 100%; height: auto; border-radius: 6px; transition: transform 0.3s; }
+  .product:hover img { transform: scale(1.05); }
+
+  input, select, button, textarea { padding: 0.5em; margin: 0.3em 0; width: 100%; font-family: Arial, sans-serif; }
+  button { border-radius: 25px; border: 2px solid #000; background: #000; color: #fff; cursor: pointer; transition: all 0.3s; }
+  button:hover { background: #fff; color: #000; }
+
+  #cart { position: fixed; top: 1em; right: -300px; background: #f8f8f8; padding: 1em; border: 1px solid #000; width: 260px; transition: right 0.3s ease; z-index: 1000; }
   #cart.open { right: 1em; }
   #checkout { margin-top: 1em; }
   #cart-icon { cursor: pointer; width: 30px; height: 30px; position: absolute; top: 10px; right: 10px; }
+
+  #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 10px 20px; border-radius: 5px; display: none; z-index: 99999; }
+
+  #product-page {
+    display: none;
+    padding: 1em;
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: center;
+    color: #000;
+  }
+  #product-page img {
+    width: 80%;
+    border-radius: 10px;
+    margin: 20px 0;
+    transition: transform 0.3s;
+  }
+  #product-page img:hover { transform: scale(1.05); }
+
+  #back-btn {
+    display: inline-block;
+    margin-bottom: 20px;
+    font-size: 1em;
+    color: #000;
+    background: none;
+    border: 2px solid #000;
+    border-radius: 25px;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: transform 0.3s, background 0.3s, color 0.3s;
+  }
+  #back-btn:hover { transform: translateY(-8px); background: #000; color: #fff; }
+
+  #related {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+  }
+  #related .product {
+    width: 120px;
+    text-align: center;
+    border: 1px solid #000;
+    padding: 5px;
+    border-radius: 8px;
+    background: #fff;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  #related .product:hover { transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.1); cursor: pointer; }
+  #related .product img { width: 100%; border-radius: 6px; transition: transform 0.3s; }
+  #related .product h4 { font-size: 0.9em; margin: 5px 0 0 0; }
+  #related .product p { font-size: 0.8em; color: #333; margin: 2px 0 0 0; }
+
+  @media(max-width:600px){
+    #product-page img { width: 100%; }
+    #related { flex-wrap: nowrap; overflow-x: auto; }
+    #related .product { flex: 0 0 auto; width: 100px; }
+    .container { padding: 0.5em; }
+    .product { width: 45%; margin: 0.3em; }
+  }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Cheema Shop</h1>
+  <img src="download (12).png" alt="Cheema Shop Logo" style="height:50px; object-fit:contain;">
   <img src="download (4).png" alt="Cart Icon" id="cart-icon" />
 </header>
 
-<div class="container">
-
-  <!-- Product 1 -->
-  <div class="product">
-    <img src="download.png" alt="Knee Pads" />
-    <h3>Knee Pads</h3>
-    <p>Price: PKR <span>2000</span></p>
-    <select class="size-selector" data-product="1">
-      <option value="S">Small</option>
-      <option value="M">Medium</option>
-      <option value="L">Large</option>
-      <option value="XL">Extra Large</option>
-    </select>
-    <button onclick="addToCart(1)">Add to Cart</button>
-  </div>
-
-  <!-- Product 2 -->
-  <div class="product">
-    <img src="download (2).png" alt="Salah Prayer Mat" />
-    <h3>Ergonomic Salah Prayer Mat</h3>
-    <p>Price: PKR <span>5900</span></p>
-    <button onclick="addToCart(2)">Add to Cart</button>
-  </div>
-
-  <!-- Product 3 -->
-  <div class="product">
-    <img src="download (3).png" alt="Islamic Jar" />
-    <h3>Islamic Jar</h3>
-    <p>Price: PKR <span>990</span></p>
-    <button onclick="addToCart(3)">Add to Cart</button>
-  </div>
-
+<div class="container" id="main-container">
+  <div class="product"><img src="download.png" alt="Knee Pads" /><h3>Knee Pads</h3><p>Price: PKR <span>2000</span></p></div>
+  <div class="product"><img src="download (2).png" alt="Salah Prayer Mat" /><h3>Ergonomic Salah Prayer Mat</h3><p>Price: PKR <span>5900</span></p></div>
+  <div class="product"><img src="download (3).png" alt="Islamic Jar" /><h3>Islamic Jar</h3><p>Price: PKR <span>990</span></p></div>
+  <div class="product"><img src="download (11).png" alt="Premium Memory Foam Prayer Mat" /><h3>Memory Foam Prayer Mat</h3><p>Price: PKR <span>3800</span></p></div>
+  <div class="product"><img src="download (7).png" alt="Tasbeeh Digital Counter" /><h3>Tasbeeh Digital Counter</h3><p>Price: PKR <span>2700</span></p></div>
+  <div class="product"><img src="download (5).png" alt="Wooden Quran Stand" /><h3>Wooden Quran Stand</h3><p>Price: PKR <span>690</span></p></div>
+  <div class="product"><img src="download (10).png" alt="Personalized Bottle" /><h3>Personalized Bottle</h3><p>Price: PKR <span>1300</span></p></div>
+  <div class="product"><img src="download (9).png" alt="Portable Quran Speaker" /><h3>Quran Speaker</h3><p>Price: PKR <span>2300</span></p></div>
 </div>
 
 <div id="cart">
   <h3>Cart</h3>
   <ul id="cart-items"></ul>
   <strong>Total: PKR <span id="cart-total">0</span></strong>
-
   <div id="customer-info">
     <h4>Customer Details</h4>
     <input type="text" id="customer-name" placeholder="Your Name" />
@@ -84,114 +122,132 @@
       <option value="cod">Cash on Delivery</option>
     </select>
   </div>
-
   <div id="checkout">
-    <button onclick="checkout()">Checkout</button>
+    <button onclick="checkout()">Checkout via WhatsApp</button>
   </div>
 </div>
 
-<script>
-let cart = [];
+<div id="product-page">
+  <img id="pp-img" src="" alt="Product Image">
+  <button id="back-btn">← Back to Products</button>
+  <h2 id="pp-name"></h2>
+  <p>Price: PKR <span id="pp-price"></span></p>
+  <div id="pp-size-box" style="display:none;">
+    <label>Select Size:</label>
+    <select id="pp-size">
+      <option value="S">Small</option>
+      <option value="M">Medium</option>
+      <option value="L">Large</option>
+      <option value="XL">Extra Large</option>
+    </select>
+  </div>
+  <div id="pp-custom-box" style="display:none;">
+    <label>Enter Name for Bottle:</label>
+    <input type="text" id="pp-custom" placeholder="Enter name" />
+  </div>
+  <button id="pp-add-btn">Add to Cart</button>
+  <h3>Related Products</h3>
+  <div id="related"></div>
+</div>
 
-const products = {
-  1: { id: 1, name: "Knee Pads", price: 2000 },
-  2: { id: 2, name: "Ergonomic Salah Prayer Mat", price: 5900 },
-  3: { id: 3, name: "Islamic Jar", price: 990 }
+<div id="toast"></div>
+
+<script>
+let cart=[];
+const products={
+  1:{id:1,name:"Knee Pads",price:2000},
+  2:{id:2,name:"Ergonomic Salah Prayer Mat",price:5900},
+  3:{id:3,name:"Islamic Jar",price:990},
+  4:{id:4,name:"Memory Foam Prayer Mat",price:3800},
+  5:{id:5,name:"Tasbeeh Digital Counter",price:1700},
+  6:{id:6,name:"Wooden Quran Stand",price:670},
+  7:{id:7,name:"Quran Speaker",price:2600},
+  8:{id:8,name:"Personalized Bottle",price:8100},
+  
 };
 
-// Toggle cart visibility
-const cartIcon = document.getElementById("cart-icon");
-const cartElement = document.getElementById("cart");
-cartIcon.addEventListener("click", () => {
-  cartElement.classList.toggle("open");
+window.addEventListener("load",()=>{document.querySelectorAll(".product").forEach(p=>p.classList.add("show"));});
+document.getElementById("cart-icon").onclick=()=>document.getElementById("cart").classList.toggle("open");
+function showToast(msg){const t=document.getElementById("toast");t.innerText=msg;t.style.display="block";setTimeout(()=>t.style.display="none",2000);}
+
+function showProduct(productId){
+  let p=products[productId];
+  const prodDiv=document.querySelectorAll(".product")[productId-1];
+  document.getElementById("pp-img").src=prodDiv.querySelector("img").src;
+  document.getElementById("pp-name").innerText=p.name;
+  document.getElementById("pp-price").innerText=p.price;
+  document.getElementById("pp-size-box").style.display=(productId===1)?"block":"none";
+  document.getElementById("pp-custom-box").style.display=(productId===7)?"block":"none";
+  document.getElementById("pp-custom").value="";
+  document.getElementById("main-container").style.display="none";
+  document.getElementById("product-page").style.display="block";
+
+  const rel=document.getElementById("related"); rel.innerHTML="";
+  Object.values(products).forEach(pr=>{
+    if(pr.id!==productId){
+      const d=document.createElement("div"); d.className="product";
+      d.innerHTML=`<img src="download (${pr.id}).png" /><h4>${pr.name}</h4><p>PKR ${pr.price}</p>`;
+      d.onclick=()=>showProduct(pr.id);
+      rel.appendChild(d);
+    }
+  });
+
+  document.getElementById("pp-add-btn").onclick=()=>{
+    let size="Standard",custom="";
+    if(productId===1) size=document.getElementById("pp-size").value;
+    if(productId===7) custom=document.getElementById("pp-custom").value.trim()||"Unnamed";
+    const existing=cart.find(c=>c.id===p.id && c.size===size && c.customName===custom);
+    if(existing) existing.quantity++; else cart.push({...p,size,customName:custom,quantity:1});
+    renderCart(); showToast("Added to cart!");
+  };
+}
+
+document.querySelectorAll(".product").forEach((prod,index)=>{
+  prod.addEventListener("click",()=>showProduct(index+1));
 });
 
-// Add product to cart
-function addToCart(productId) {
-  const product = products[productId];
-  let size = "Standard";
+document.getElementById("back-btn").onclick=()=>{
+  document.getElementById("product-page").style.display="none";
+  document.getElementById("main-container").style.display="flex";
+};
 
-  if (productId === 1) {
-    const sizeSelector = document.querySelector(`.size-selector[data-product="${productId}"]`);
-    size = sizeSelector.value;
-  }
-
-  const existing = cart.find(c => c.id === product.id && c.size === size);
-
-  if (existing) {
-    existing.quantity++;
-  } else {
-    cart.push({ ...product, size: size, quantity: 1 });
-  }
-
-  renderCart();
-  cartElement.classList.add("open"); // Auto-open cart when adding item
+function renderCart(){
+  const cartItems=document.getElementById("cart-items");
+  const cartTotal=document.getElementById("cart-total");
+  cartItems.innerHTML=""; let total=0;
+  cart.forEach(item=>{
+    let text=`${item.name} (${item.size})`;
+    if(item.customName) text+=` - ${item.customName}`;
+    text+=` x ${item.quantity} - PKR ${item.price*item.quantity}`;
+    const li=document.createElement("li"); li.textContent=text; cartItems.appendChild(li);
+    total+=item.price*item.quantity;
+  });
+  cartTotal.textContent=total;
 }
 
-// Render cart items
-function renderCart() {
-  const cartItems = document.getElementById("cart-items");
-  const cartTotal = document.getElementById("cart-total");
-  cartItems.innerHTML = "";
-  let total = 0;
-
-  cart.forEach(item => {
-    const li = document.createElement("li");
-    li.textContent = `${item.name} (${item.size}) x ${item.quantity} - PKR ${item.price * item.quantity}`;
-    cartItems.appendChild(li);
-    total += item.price * item.quantity;
+function checkout(){
+  if(cart.length===0) return alert("Your cart is empty!");
+  const name=document.getElementById("customer-name").value.trim();
+  const phone=document.getElementById("customer-phone").value.trim();
+  const address=document.getElementById("customer-address").value.trim();
+  const payment=document.getElementById("payment-method").value;
+  if(!name||!phone||!address) return alert("Please fill all customer details.");
+  let total=cart.reduce((s,i)=>s+i.price*i.quantity,0);
+  if(payment==="cod") total+=300;
+  let paymentText=payment==="cod"?"Cash on Delivery (Delivery Fee: 300 PKR)":"Easypaisa";
+  let orderDetails=`*Order Details:*\nCustomer: ${name}\nPhone: ${phone}\nAddress: ${address}\nPayment: ${paymentText}\n\nItems:\n`;
+  cart.forEach(item=>{
+    let text=`${item.name} (${item.size})`;
+    if(item.customName) text+=` - ${item.customName}`;
+    text+=` x ${item.quantity} - PKR ${item.price*item.quantity}\n`;
+    orderDetails+=text;
   });
-
-  cartTotal.textContent = total;
-}
-
-// Checkout process
-function checkout() {
-  if (cart.length === 0) {
-    alert("Your cart is empty!");
-    return;
-  }
-
-  const name = document.getElementById("customer-name").value.trim();
-  const phone = document.getElementById("customer-phone").value.trim();
-  const address = document.getElementById("customer-address").value.trim();
-  const payment = document.getElementById("payment-method").value;
-
-  if (!name || !phone || !address) {
-    alert("Please fill all customer details.");
-    return;
-  }
-
-  let total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  let paymentText = "";
-
-  if (payment === "cod") {
-    total += 300;
-    paymentText = "Cash on Delivery (Delivery Fee: 300 PKR)";
-  } else {
-    paymentText = "Easypaisa (Payable Amount: " + total + " PKR)";
-  }
-
-  let orderDetails = `Order Details:\n\nCustomer Name: ${name}\nPhone: ${phone}\nAddress: ${address}\nPayment Method: ${paymentText}\n\nItems:\n`;
-  cart.forEach(item => {
-    orderDetails += `${item.name} (${item.size}) x ${item.quantity} - PKR ${item.price * item.quantity}\n`;
-  });
-  orderDetails += `\nTotal: PKR ${total}`;
-
-  // Open default email client (Gmail, etc.) with order details
-  const mailtoLink = `mailto:iqbalayesha0151@gmail.com?subject=${encodeURIComponent("New Order from Cheema Shop")}&body=${encodeURIComponent(orderDetails)}`;
-  window.location.href = mailtoLink;
-
-  // Reset cart
-  cart = [];
-  renderCart();
-  cartElement.classList.remove("open");
-  document.getElementById("customer-name").value = "";
-  document.getElementById("customer-phone").value = "";
-  document.getElementById("customer-address").value = "";
-  document.getElementById("payment-method").value = "easypaisa";
+  orderDetails+=`\n*Total: PKR ${total}*`;
+  const waLink=`https://wa.me/03494949454?text=${encodeURIComponent(orderDetails)}`;
+  window.open(waLink,'_blank');
+  cart=[]; renderCart();
 }
 </script>
-
 </body>
 </html>
+
